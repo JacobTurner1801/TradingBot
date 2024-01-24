@@ -11,7 +11,6 @@ def xg_path():
     xgb_sec = read_xgb_sec()
     amazon_df = get_data("AMZN", "max")
     amazon_df.dropna()
-    # create xgboost model
     X_train, x_test, y_train, y_test = split_data(amazon_df)
     predictions = train_and_fit(X_train, y_train, x_test)  # model created here
     df_res = get_metrics_results(y_test, predictions)
@@ -27,8 +26,8 @@ def ls_path():
 def main():
     inp = int(input("Enter 1 for XGBoost, 2 for LSTM: "))
     if inp == 1:
-        df = xg_path()
-        print(df)
+        results = xg_path()
+        print(results)
     elif inp == 2:
         ls_path()
     else:
