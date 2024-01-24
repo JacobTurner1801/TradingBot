@@ -13,7 +13,7 @@ def xg_path():
     amazon_df.dropna()
     # create xgboost model
     X_train, x_test, y_train, y_test = split_data(amazon_df)
-    predictions = train_and_fit(X_train, y_train, x_test)
+    predictions = train_and_fit(X_train, y_train, x_test)  # model created here
     df_res = get_metrics_results(y_test, predictions)
     return df_res
 
