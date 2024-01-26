@@ -40,6 +40,7 @@ def make_frame(metrics):
 
 
 def get_metrics_results(y_test, predictions):
+    print(predictions)
     mae = mean_absolute_error(y_test, predictions)
     rmse = np.sqrt(mean_squared_error(y_test, predictions))
     smape = symetric_mape(y_test, predictions)
