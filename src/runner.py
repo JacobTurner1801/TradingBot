@@ -10,6 +10,7 @@ from models.lstm.ls_model import lstm_single_layer_model, run_model
 from keras.models import Sequential
 from keras.layers import Dropout, LSTM, Dense
 
+
 def xg_path():
     xgb_key = read_xgb_key()
     xgb_sec = read_xgb_sec()
@@ -21,63 +22,41 @@ def xg_path():
     return df_res
 
 
+def create_dataset_lstm(dataset, time_steps=1):
+    X, y = [], []
+    for i in range(len(dataset) - time_steps):
+        a = dataset[i : (i + time_steps), 0]
+        X.append(a)
+        y.append(dataset[i + time_steps, 0])
+    return np.array(X), np.array(y)
+
+
+def ls_do_data_prep(data):
+    scaler = MinMaxScaler(feature_range=(0, 1))
+    scaled_data = scaler.fit_transform(data)
+    train_size = int(len(scaled_data) * 0.8)
+    train_data, test_data = scaled_data[:train_size], scaled_data[train_size:]
+    # create datasets
+    time_steps = 10
+    X_train, y_train = create_dataset_lstm(train_data, time_steps)
+    X_test, y_test = create_dataset_lstm(test_data, time_steps)
+    X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
+    X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1], 1))
+    return X_train, X_test, y_train, y_test, scaler
+
+
 def ls_path():
     lstm_key = read_lstm_key()
     lstm_sec = read_lstm_sec()
     amazon_df = get_data("AMZN", "max")
     amazon_df.dropna()
-    scalar = MinMaxScaler(feature_range=(0, 1))
-    close_data = amazon_df["Close"].values.reshape(-1, 1)
-    scaled_data = scalar.fit_transform(close_data)
-    train_data = scaled_data[0:int(close_data.size), :]
-    # Split the data into x_train and y_train data sets
-    x_train = []
-    y_train = []
-
-    for i in range(60, len(train_data)):
-        x_train.append(train_data[i-60:i, 0])
-        y_train.append(train_data[i, 0])
-        if i<= 61:
-            print(x_train)
-            print(y_train)
-            print()
-        
-    # Convert the x_train and y_train to numpy arrays 
-    x_train, y_train = np.array(x_train), np.array(y_train)
-
-    # Reshape the data
-    x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], 1))
-    model = Sequential()
-    model.add(LSTM(128, return_sequences=True, input_shape= (x_train.shape[1], 1)))
-    model.add(LSTM(64, return_sequences=False))
-    model.add(Dense(25))
-    model.add(Dense(1))
-
-    # Compile the model
-    model.compile(optimizer='adam', loss='mean_squared_error')
-
-    # Train the model
-    model.fit(x_train, y_train, batch_size=1, epochs=1)
-    
-    test_data = scaled_data[close_data.size - 60: , :]
-    # Create the data sets x_test and y_test
-    x_test = []
-    y_test = close_data[len(x_train):, :]
-    for i in range(60, len(test_data)):
-        x_test.append(test_data[i-60:i, 0])
-
-    # Convert the data to a numpy array
-    x_test = np.array(x_test)
-
-    # Reshape the data
-    x_test = np.reshape(x_test, (x_test.shape[0], x_test.shape[1], 1 ))
-
-    # Get the models predicted price values 
-    predictions = model.predict(x_test)
-    predictions = scalar.inverse_transform(predictions)
+    data = amazon_df["Close"].values.reshape(-1, 1)
+    X_train, X_test, y_train, y_test, scaler = ls_do_data_prep(data)
+    model = lstm_single_layer_model(X_train)
+    predictions = run_model(model, X_train, y_train, X_test)
+    predictions = scaler.inverse_transform(predictions)
     df_res = get_metrics_results(y_test, predictions)
     return df_res
-    
 
 
 def main():
