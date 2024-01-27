@@ -7,8 +7,6 @@ from keys.read_keys import *
 from util import get_data, split_data, get_metrics_results
 from models.xgboost.gb_model import *
 from models.lstm.ls_model import lstm_single_layer_model, run_model
-from keras.models import Sequential
-from keras.layers import Dropout, LSTM, Dense
 
 
 def xg_path():
