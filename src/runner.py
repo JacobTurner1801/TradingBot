@@ -10,8 +10,8 @@ from models.lstm.ls_model import lstm_single_layer_model, run_model
 
 
 def xg_path():
-    xgb_key = read_xgb_key()
-    xgb_sec = read_xgb_sec()
+    # xgb_key = read_xgb_key()
+    # xgb_sec = read_xgb_sec()
     amazon_df = get_data("AMZN", "max")
     amazon_df.dropna()
     X_train, x_test, y_train, y_test = split_data(amazon_df)
