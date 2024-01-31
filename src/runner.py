@@ -44,8 +44,8 @@ def ls_do_data_prep(data):
 
 
 def ls_path():
-    lstm_key = read_lstm_key()
-    lstm_sec = read_lstm_sec()
+    # lstm_key = read_lstm_key()
+    # lstm_sec = read_lstm_sec()
     amazon_df = get_data("AMZN", "max")
     amazon_df.dropna()
     data = amazon_df["Close"].values.reshape(-1, 1)
