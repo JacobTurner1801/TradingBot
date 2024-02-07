@@ -28,7 +28,7 @@ def create_single_layer(x_train):
     return LSTM(units=50, activation="relu", input_shape=(x_train.shape[1], 1))
 
 
-def generate_five_day_predictions(df):
+def generate_five_day_predictions_lstm(df):
     # Feature scaling
     scaler = MinMaxScaler()
     df["Close_scaled"] = scaler.fit_transform(df[["Close"]])
