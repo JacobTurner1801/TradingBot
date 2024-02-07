@@ -9,7 +9,7 @@ from models.xgboost.gb_model import *
 from models.lstm.ls_model import lstm_single_layer_model, run_model
 
 
-def xg_path():
+def xg_path_mvp():
     # xgb_key = read_xgb_key()
     # xgb_sec = read_xgb_sec()
     amazon_df = get_data("AMZN", "max")
@@ -43,7 +43,7 @@ def ls_do_data_prep(data):
     return X_train, X_test, y_train, y_test, scaler
 
 
-def ls_path():
+def ls_path_mvp():
     # lstm_key = read_lstm_key()
     # lstm_sec = read_lstm_sec()
     amazon_df = get_data("AMZN", "max")
@@ -57,14 +57,24 @@ def ls_path():
     return df_res
 
 
-def main():
+def run_type_model():
     inp = int(input("Enter 1 for XGBoost, 2 for LSTM: "))
     if inp == 1:
-        results = xg_path()
+        results = xg_path_mvp()
         print(results)
     elif inp == 2:
-        results = ls_path()
+        results = ls_path_mvp()
         print(results)
+    else:
+        print("Invalid input")
+
+
+def main():
+    inp = int(input("1 for MVP, 2 for full software:"))
+    if inp == 1:
+        run_type_model()
+    elif inp == 2:
+        print("Not implemented yet")
     else:
         print("Invalid input")
     return 0
