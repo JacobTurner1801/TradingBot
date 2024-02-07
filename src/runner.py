@@ -2,11 +2,12 @@
 # Main job is to run each model on the data up until today
 # and then predict the next day's price
 import numpy as np
+import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 from keys.read_keys import *
 from util import get_data, split_data, get_metrics_results
 from models.xgboost.gb_model import *
-from models.lstm.ls_model import lstm_single_layer_model, run_model
+from models.lstm.ls_model import *
 
 
 def xg_path_mvp():
@@ -29,9 +30,9 @@ def create_dataset_lstm(dataset, time_steps=1):
     return np.array(X), np.array(y)
 
 
-def ls_do_data_prep(data):
+def ls_do_data_prep(data: pd.DataFrame):
     scaler = MinMaxScaler(feature_range=(0, 1))
-    scaled_data = scaler.fit_transform(data)
+    scaled_data = scaler.fit_transform(data.values.reshape(-1, 1))
     train_size = int(len(scaled_data) * 0.8)
     train_data, test_data = scaled_data[:train_size], scaled_data[train_size:]
     # create datasets
@@ -57,7 +58,7 @@ def ls_path_mvp():
     return df_res
 
 
-def run_type_model():
+def run_type_model_mvp():
     inp = int(input("Enter 1 for XGBoost, 2 for LSTM: "))
     if inp == 1:
         results = xg_path_mvp()
@@ -72,9 +73,25 @@ def run_type_model():
 def main():
     inp = int(input("1 for MVP, 2 for full software:"))
     if inp == 1:
-        run_type_model()
+        run_type_model_mvp()
     elif inp == 2:
-        print("Not implemented yet")
+        inp = int(input("Enter 1 for XGBoost, 2 for LSTM: "))
+        if inp == 1:
+            # create xgboost model
+            amazon_df: pd.DataFrame = get_data("AMZN", "max")
+            amazon_df.dropna()
+            generate_five_day_predictions_xgb(amazon_df)
+        if inp == 2:
+            # create single layer lstm model
+            amazon_df: pd.DataFrame = get_data("AMZN", "max")
+            amazon_df.dropna()
+            close_data = amazon_df["Close"].values.reshape(-1, 1)
+            # put close_data and date index into new df of just close data
+            data: pd.DataFrame = pd.DataFrame(
+                close_data, index=amazon_df.index, columns=["Close"]
+            )
+            data = data.sort_index()
+            generate_five_day_predictions_lstm(data)
     else:
         print("Invalid input")
     return 0
