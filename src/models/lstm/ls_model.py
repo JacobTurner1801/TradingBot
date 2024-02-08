@@ -3,31 +3,41 @@ from keras.layers import LSTM, Dense
 import numpy as np
 from datetime import timedelta
 from sklearn.preprocessing import MinMaxScaler
+from lstm_util import *
 
-
+"""
+Single layer LSTM model (for MVP)
+@return model
+"""
 def lstm_single_layer_model(x_train):
     # model
     model = Sequential()
-    model.add(create_single_layer(x_train))
+    model.add(create_single_layer(x_train, activation_func="tanh"))
     model.add(Dense(units=1))
     model.compile(optimizer="adam", loss="mean_squared_error")
     return model
 
-
+"""
+Run single LSTM model, this is not tested for the multilayered one
+See ls_multi_layered_model.py for the multilayered model
+@return predictions
+"""
 def run_model(model: Sequential, X_train, y_train, x_test):
     model.fit(X_train, y_train, epochs=50, batch_size=32)
     predictions = model.predict(x_test)
     return predictions
 
-
+"""
+Run single layered model for the entire dataset
+@return nothing, just fits the model
+"""
 def run_model_whole_dataset(model: Sequential, X, y, ep, bs):
     model.fit(X.reshape(X.shape[0], X.shape[1], 1), y, epochs=ep, batch_size=bs)
 
-
-def create_single_layer(x_train):
-    return LSTM(units=50, activation="relu", input_shape=(x_train.shape[1], 1))
-
-
+"""
+Generate 5 day predictions using single layer LSTM model
+@return nothing, just prints the predictions 
+"""
 def generate_five_day_predictions_lstm(df):
     # Feature scaling
     scaler = MinMaxScaler()
@@ -74,8 +84,11 @@ def generate_five_day_predictions_lstm(df):
 
         next_items.append({"Date": next_date, "Close": next_item})
 
+    
     # Display the generated next 5 items with dates
     for item in next_items:
         print(
             f"Date: {item['Date'].strftime('%Y-%m-%d')}, Close Price: {item['Close']:.2f}"
         )
+    # TODO: return the predictions
+# end generate_five_day_predictions_lstm

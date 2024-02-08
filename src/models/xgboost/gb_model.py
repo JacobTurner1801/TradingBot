@@ -3,21 +3,30 @@ import numpy as np
 import pandas as pd
 from datetime import timedelta
 
-
-def create_model():
+"""
+Create xgboost model without using bayesian optimisation
+@return model
+"""
+def create_model(n_est=1000, lr=0.01, md=5):
     model = xgboost.XGBRegressor(
-        n_estimators=1000, learning_rate=0.01, max_depth=5, random_state=1
+        n_estimators=n_est, learning_rate=lr, max_depth=md, random_state=1
     )
     return model
 
-
+"""
+train and run xgboost model on a split dataset
+@return predictions
+"""
 def train_and_fit(x_train, y_train, x_test):
     model = create_model()
     model.fit(x_train, y_train)
     prediction = model.predict(x_test)
     return prediction
 
-
+"""
+Generate 5 day predictions using xgboost model
+@return nothing, just prints the predictions
+"""
 def generate_five_day_predictions_xgb(df: pd.DataFrame):
     df = df.dropna()
     df = df.sort_index()
@@ -45,3 +54,5 @@ def generate_five_day_predictions_xgb(df: pd.DataFrame):
         )
     for item in next_items:
         print(f"Date: {item['Date']}, Close: {item['Close']}")
+    # TODO: return the predictions
+# end generate_five_day_predictions_xgb
