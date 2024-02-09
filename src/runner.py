@@ -8,6 +8,7 @@ from keys.read_keys import *
 from util import get_data, split_data, get_metrics_results
 from models.xgboost.gb_model import *
 from models.lstm.ls_model import *
+from models.lstm.ls_multi_layered_model import *
 
 
 def xg_path_mvp():
@@ -91,7 +92,9 @@ def main():
                 close_data, index=amazon_df.index, columns=["Close"]
             )
             data = data.sort_index()
-            generate_five_day_predictions_lstm(data)
+            # model = lstm_single_layer_model(data)
+            model = lstm_multi_layered(data, "relu", 1)
+            generate_five_day_predictions_lstm(data, model)
     else:
         print("Invalid input")
     return 0

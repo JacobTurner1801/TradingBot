@@ -3,7 +3,7 @@ from keras.layers import LSTM, Dense
 import numpy as np
 from datetime import timedelta
 from sklearn.preprocessing import MinMaxScaler
-from lstm_util import *
+from models.lstm.lstm_util import *
 
 """
 Single layer LSTM model (for MVP)
@@ -38,7 +38,7 @@ def run_model_whole_dataset(model: Sequential, X, y, ep, bs):
 Generate 5 day predictions using single layer LSTM model
 @return nothing, just prints the predictions 
 """
-def generate_five_day_predictions_lstm(df):
+def generate_five_day_predictions_lstm(df, model):
     # Feature scaling
     scaler = MinMaxScaler()
     df["Close_scaled"] = scaler.fit_transform(df[["Close"]])
@@ -55,8 +55,6 @@ def generate_five_day_predictions_lstm(df):
 
     X, y = np.array(X), np.array(y)
 
-    model = lstm_single_layer_model(X)
-
     run_model_whole_dataset(model, X, y, 50, 32)
 
     # Generate the next 5 items in the sequence
@@ -72,17 +70,25 @@ def generate_five_day_predictions_lstm(df):
 
         # Predict the next item
         next_item_scaled = model.predict(input_sequence)[0, 0]
-
+        next_item_scaled = np.reshape(next_item_scaled, (1, -1))
+        # print(f"next item scaled: {next_item_scaled}")
+        # weird hack to make everything work correctly, idk why this is needed xd
+        extracted_value_from_scaled = next_item_scaled[0][0]
+        # put into np.array
+        extracted = np.array([extracted_value_from_scaled])
+        # reshape into 2d array
+        extracted = extracted.reshape(-1, 1)
         # Append the next item to the sequence
-        last_sequence = np.append(last_sequence[1:], next_item_scaled)
-
+        last_sequence = np.append(last_sequence[1:], extracted_value_from_scaled)
+        # print(f"last sequence: {last_sequence}")
         # Inverse transform to get the actual stock price
-        next_item = scaler.inverse_transform([[next_item_scaled]])[0, 0]
-
+        next_item = scaler.inverse_transform(extracted)
+        # print(f"next item: {next_item}")
         # Append the next date
-        next_date = last_date + timedelta(days=i + 1)
+        next_date = last_date + timedelta(days=1)
+        last_date = next_date
 
-        next_items.append({"Date": next_date, "Close": next_item})
+        next_items.append({"Date": next_date, "Close": next_item[0][0]})
 
     
     # Display the generated next 5 items with dates
