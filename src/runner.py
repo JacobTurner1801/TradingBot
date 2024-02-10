@@ -9,11 +9,10 @@ from util import get_data, split_data, get_metrics_results
 from models.xgboost.gb_model import *
 from models.lstm.ls_model import *
 from models.lstm.ls_multi_layered_model import *
+from pybroker import Alpaca
 
 
 def xg_path_mvp():
-    # xgb_key = read_xgb_key()
-    # xgb_sec = read_xgb_sec()
     amazon_df = get_data("AMZN", "max")
     amazon_df.dropna()
     X_train, x_test, y_train, y_test = split_data(amazon_df)
@@ -46,8 +45,6 @@ def ls_do_data_prep(data: pd.DataFrame):
 
 
 def ls_path_mvp():
-    # lstm_key = read_lstm_key()
-    # lstm_sec = read_lstm_sec()
     amazon_df = get_data("AMZN", "max")
     amazon_df.dropna()
     data = amazon_df["Close"].values.reshape(-1, 1)
@@ -69,6 +66,14 @@ def run_type_model_mvp():
         print(results)
     else:
         print("Invalid input")
+
+
+def get_keys():
+    xk = read_xgb_key()
+    lk = read_lstm_key()
+    xs = read_xgb_sec()
+    ls = read_lstm_sec()
+    return xk, lk, xs, ls
 
 
 def main():
@@ -95,6 +100,12 @@ def main():
             # model = lstm_single_layer_model(data)
             model = lstm_multi_layered(data, "relu", 1)
             generate_five_day_predictions_lstm(data, model)
+            # since we have created the predictions, we can now connect to alpaca
+            # and buy or sell based on the predictions
+            xgb_key, lstm_key, xgb_sec, lstm_sec = get_keys()
+            # alpaca = Alpaca()
+            # alpaca.connect()
+            # print("Connected to Alpaca")
     else:
         print("Invalid input")
     return 0
