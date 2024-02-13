@@ -46,17 +46,32 @@ def create_dataset_lstm(dataset, time_steps=1):
 
 
 def ls_do_data_prep(data):
+    # Extracting closing prices
+    data = data["Close"].values.reshape(-1, 1)
+
+    # Normalize the data
     scaler = MinMaxScaler(feature_range=(0, 1))
-    vals = data
-    scaled_data = scaler.fit_transform(vals.reshape(-1, 1))
-    train_size = int(len(scaled_data) * 0.8)
-    train_data, test_data = scaled_data[:train_size], scaled_data[train_size:]
-    # create datasets
-    time_steps = 10
-    X_train, y_train = create_dataset_lstm(train_data, time_steps)
-    X_test, y_test = create_dataset_lstm(test_data, time_steps)
-    X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
-    X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1], 1))
+    scaled_data = scaler.fit_transform(data)
+
+    # Create sequences and labels
+    def create_sequences(data, seq_length):
+        sequences = []
+        labels = []
+        for i in range(len(data) - seq_length):
+            seq = data[i : i + seq_length]
+            label = data[i + seq_length]
+            sequences.append(seq)
+            labels.append(label)
+        return np.array(sequences), np.array(labels)
+
+    # Set sequence length (e.g., 5 days)
+    seq_length = 5
+    X, y = create_sequences(scaled_data, seq_length)
+    split_percentage = 0.8
+    split = int(split_percentage * len(X))
+
+    X_train, X_test = X[:split], X[split:]
+    y_train, y_test = y[:split], y[split:]
     return X_train, X_test, y_train, y_test, scaler
 
 
@@ -75,16 +90,15 @@ def make_lstm_preds_better_df(preds):
 def ls_path_mvp(stock):
     amazon_df = get_data(stock, "max")
     amazon_df.dropna()
-    data = amazon_df["Close"].values.reshape(-1, 1)
-    X_train, X_test, y_train, y_test, scaler = ls_do_data_prep(data)
-    model = lstm_single_layer_model(X_train)
-    predictions = run_model(model, X_train, y_train, X_test)
-    predictions = scaler.inverse_transform(predictions)
-    df_res = get_metrics_results(y_test, predictions)
-    # df_res.to_csv("lstm_single_layers_results.csv")
-    df_preds = generate_five_day_predictions_lstm(amazon_df, model)
-    df_preds = make_lstm_preds_better_df(df_preds)
-    return df_res, df_preds
+    X_train, X_test, y_train, y_test, scaler = ls_do_data_prep(amazon_df)
+    model = lstm_multi_layered("relu", 10, 5)
+    model.fit(X_train, y_train, epochs=50, batch_size=32)
+    predicted_prices = model.predict(X_test)
+    predicted_prices = scaler.inverse_transform(predicted_prices)
+    y_test = scaler.inverse_transform(y_test.reshape(-1, 1))
+    df_res = get_metrics_results(y_test, predicted_prices)
+    preds = generate_five_day_predictions_lstm(amazon_df, model)
+    return df_res, make_lstm_preds_better_df(preds)
 
 
 def run_type_model_mvp():

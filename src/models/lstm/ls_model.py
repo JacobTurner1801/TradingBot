@@ -27,6 +27,7 @@ def run_model(model: Sequential, X_train, y_train, x_test):
     Epochs = 50, batch_size = 32
     @return predictions
     """
+    print(X_train.size, x_test.size)
     model.fit(X_train, y_train, epochs=50, batch_size=32)
     predictions = model.predict(x_test)
     return predictions
