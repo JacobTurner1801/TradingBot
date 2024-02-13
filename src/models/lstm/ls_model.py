@@ -5,11 +5,11 @@ from datetime import timedelta
 from sklearn.preprocessing import MinMaxScaler
 from models.lstm.lstm_util import *
 
-"""
-Single layer LSTM model (for MVP)
-@return model
-"""
 def lstm_single_layer_model(x_train):
+    """
+    Single layer LSTM model (for MVP)
+    @return model
+    """
     # model
     model = Sequential()
     model.add(create_single_layer(x_train, activation_func="tanh"))
@@ -17,28 +17,29 @@ def lstm_single_layer_model(x_train):
     model.compile(optimizer="adam", loss="mean_squared_error")
     return model
 
-"""
-Run single LSTM model, this is not tested for the multilayered one
-See ls_multi_layered_model.py for the multilayered model
-@return predictions
-"""
 def run_model(model: Sequential, X_train, y_train, x_test):
+    """
+    Run single LSTM model, this is not tested for the multilayered one
+    See ls_multi_layered_model.py for the multilayered model
+    Epochs = 50, batch_size = 32
+    @return predictions
+    """
     model.fit(X_train, y_train, epochs=50, batch_size=32)
     predictions = model.predict(x_test)
     return predictions
 
-"""
-Run single layered model for the entire dataset
-@return nothing, just fits the model
-"""
 def run_model_whole_dataset(model: Sequential, X, y, ep, bs):
+    """
+    Run single layered model for the entire dataset
+    @return nothing, just fits the model
+    """
     model.fit(X.reshape(X.shape[0], X.shape[1], 1), y, epochs=ep, batch_size=bs)
 
-"""
-Generate 5 day predictions using single layer LSTM model
-@return nothing, just prints the predictions 
-"""
 def generate_five_day_predictions_lstm(df, model):
+    """
+    Generate 5 day predictions using single layer LSTM model
+    @return nothing, just prints the predictions 
+    """
     # Feature scaling
     scaler = MinMaxScaler()
     df["Close_scaled"] = scaler.fit_transform(df[["Close"]])
