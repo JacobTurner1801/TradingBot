@@ -1,9 +1,11 @@
 from keras.models import Sequential
-from keras.layers import LSTM, Dense
+from keras.layers import Dense
 import numpy as np
 from datetime import timedelta
 from sklearn.preprocessing import MinMaxScaler
 from models.lstm.lstm_util import *
+import pandas as pd
+
 
 def lstm_single_layer_model(x_train):
     """
@@ -17,6 +19,7 @@ def lstm_single_layer_model(x_train):
     model.compile(optimizer="adam", loss="mean_squared_error")
     return model
 
+
 def run_model(model: Sequential, X_train, y_train, x_test):
     """
     Run single LSTM model, this is not tested for the multilayered one
@@ -28,6 +31,7 @@ def run_model(model: Sequential, X_train, y_train, x_test):
     predictions = model.predict(x_test)
     return predictions
 
+
 def run_model_whole_dataset(model: Sequential, X, y, ep, bs):
     """
     Run single layered model for the entire dataset
@@ -35,10 +39,11 @@ def run_model_whole_dataset(model: Sequential, X, y, ep, bs):
     """
     model.fit(X.reshape(X.shape[0], X.shape[1], 1), y, epochs=ep, batch_size=bs)
 
+
 def generate_five_day_predictions_lstm(df, model):
     """
     Generate 5 day predictions using single layer LSTM model
-    @return nothing, just prints the predictions 
+    @return nothing, just prints the predictions
     """
     # Feature scaling
     scaler = MinMaxScaler()
@@ -91,11 +96,10 @@ def generate_five_day_predictions_lstm(df, model):
 
         next_items.append({"Date": next_date, "Close": next_item[0][0]})
 
-    
     # Display the generated next 5 items with dates
     for item in next_items:
-        print(
-            f"Date: {item['Date'].strftime('%Y-%m-%d')}, Close Price: {item['Close']:.2f}"
-        )
-    # TODO: return the predictions
+        print(f"Date: {item['Date'].strftime('%Y-%m-%d')}, Close: {item['Close']:.2f}")
+    return pd.DataFrame(next_items)
+
+
 # end generate_five_day_predictions_lstm
