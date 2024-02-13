@@ -18,6 +18,7 @@ def xg_path_mvp():
     X_train, x_test, y_train, y_test = split_data(amazon_df)
     predictions = train_and_fit(X_train, y_train, x_test)  # model created here
     df_res = get_metrics_results(y_test, predictions)
+    # df_res.to_csv("xgboost_mvp_results.csv")
     return df_res
 
 
@@ -30,9 +31,10 @@ def create_dataset_lstm(dataset, time_steps=1):
     return np.array(X), np.array(y)
 
 
-def ls_do_data_prep(data: pd.DataFrame):
+def ls_do_data_prep(data):
     scaler = MinMaxScaler(feature_range=(0, 1))
-    scaled_data = scaler.fit_transform(data.values.reshape(-1, 1))
+    vals = data
+    scaled_data = scaler.fit_transform(vals.reshape(-1, 1))
     train_size = int(len(scaled_data) * 0.8)
     train_data, test_data = scaled_data[:train_size], scaled_data[train_size:]
     # create datasets
@@ -53,6 +55,7 @@ def ls_path_mvp():
     predictions = run_model(model, X_train, y_train, X_test)
     predictions = scaler.inverse_transform(predictions)
     df_res = get_metrics_results(y_test, predictions)
+    # df_res.to_csv("lstm_single_layers_results.csv")
     return df_res
 
 
