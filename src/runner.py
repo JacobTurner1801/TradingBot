@@ -93,12 +93,18 @@ def make_lstm_preds_better_df(preds):
     return new_preds
 
 
+def test_lstms(X_train, y_train):
+    model = lstm_multi_layered("relu", 5, [10])
+    model.fit(X_train, y_train, epochs=50, batch_size=16)
+    return model
+
+
 def ls_path_mvp(stock):
     amazon_df = get_data(stock, "max")
     amazon_df.dropna()
     X_train, X_test, y_train, y_test, scaler = ls_do_data_prep(amazon_df)
-    model = lstm_multi_layered("relu", 10, 5)
-    model.fit(X_train, y_train, epochs=50, batch_size=32)
+    model = lstm_multi_layered("relu", 5, [100, 50, 20], "adam")
+    model.fit(X_train, y_train, epochs=50, batch_size=16)
     predicted_prices = model.predict(X_test)
     predicted_prices = scaler.inverse_transform(predicted_prices)
     y_test = scaler.inverse_transform(y_test.reshape(-1, 1))
