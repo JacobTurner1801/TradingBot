@@ -1,7 +1,9 @@
+from sklearn.model_selection import cross_val_score
 import xgboost as xgboost
 import numpy as np
 import pandas as pd
 from datetime import timedelta
+from bayes_opt import BayesianOptimization
 
 
 def create_model(n_est=1000, lr=0.01, md=5):
@@ -12,6 +14,54 @@ def create_model(n_est=1000, lr=0.01, md=5):
     model = xgboost.XGBRegressor(
         n_estimators=n_est, learning_rate=lr, max_depth=md, random_state=1
     )
+    return model
+
+
+def bayesian_optimisation(X, y):
+    """
+    Perform bayesian optimisation on the model
+    @return model
+    """
+
+    def xgb_evaluate(n_est, lr, md):
+        model = xgboost.XGBRegressor(
+            n_estimators=int(n_est),
+            learning_rate=lr,
+            max_depth=int(md),
+            random_state=1,
+        )
+        return np.mean(
+            cross_val_score(
+                model, X, y, cv=5, n_jobs=-1, scoring="neg_mean_squared_error"
+            )
+        )
+
+    xgb_bo = BayesianOptimization(
+        xgb_evaluate,
+        {
+            "n_est": (100, 1200),
+            "lr": (0.01, 0.3),
+            "md": (3, 10),
+        },
+    )
+
+    xgb_bo.maximize(init_points=10, n_iter=10)
+    params = xgb_bo.max["params"]
+    model = xgboost.XGBRegressor(
+        n_estimators=int(params["n_est"]),
+        learning_rate=params["lr"],
+        max_depth=int(params["md"]),
+        random_state=1,
+    )
+    return model
+
+
+def create_model_bayesian_optimisation(X, y):
+    """
+    Create xgboost model using bayesian optimisation
+    @return model
+    """
+    model = bayesian_optimisation(X, y)
     return model
 
 

@@ -24,15 +24,21 @@ def xg_make_preds_more_readable(preds):
     return new_preds
 
 
-def xg_path_mvp(stock):
-    amazon_df = get_data(stock, "max")
-    amazon_df.dropna()
-    X_train, x_test, y_train, y_test = split_data(amazon_df)
-    predictions = train_and_fit(X_train, y_train, x_test)  # model created here
+def xg_path_bayesian_optimisation(stock):
+    df = get_data(stock, "max")
+    df.dropna()
+    X_train, x_test, y_train, y_test = split_data(df)
+    model = create_model_bayesian_optimisation(X_train, y_train)
+    model.fit(X_train, y_train)
+    predictions = model.predict(x_test)
     df_res = get_metrics_results(y_test, predictions)
-    # df_res.to_csv("xgboost_mvp_results.csv")
-    preds = generate_five_day_predictions_xgb(amazon_df)
+    preds = generate_five_day_predictions_xgb(df)
     preds = xg_make_preds_more_readable(preds)
+    return df_res, preds
+
+
+def xg_path_mvp(stock):
+    df_res, preds = xg_path_bayesian_optimisation(stock)
     return df_res, preds
 
 
