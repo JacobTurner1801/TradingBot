@@ -93,12 +93,6 @@ def make_lstm_preds_better_df(preds):
     return new_preds
 
 
-def test_lstms(X_train, y_train):
-    model = lstm_multi_layered("relu", 5, [10])
-    model.fit(X_train, y_train, epochs=50, batch_size=16)
-    return model
-
-
 def ls_path_mvp(stock):
     amazon_df = get_data(stock, "max")
     amazon_df.dropna()
@@ -138,35 +132,17 @@ def get_keys():
 
 
 def main():
+    xk, lk, xs, ls = get_keys()
     inp = int(input("1 for MVP, 2 for full software:"))
     if inp == 1:  # MVP
         run_type_model_mvp()
     elif inp == 2:  # Alpaca stuff
         inp = int(input("Enter 1 for XGBoost, 2 for LSTM: "))
         if inp == 1:
-            # create xgboost model
-            amazon_df: pd.DataFrame = get_data("AMZN", "max")
-            amazon_df.dropna()
-            preds = generate_five_day_predictions_xgb(amazon_df)
+            # connect to xgboost alpaca account
+            xg = Alpaca(xk, xs)
         if inp == 2:
-            # create single layer lstm model
-            amazon_df: pd.DataFrame = get_data("AMZN", "max")
-            amazon_df.dropna()
-            close_data = amazon_df["Close"].values.reshape(-1, 1)
-            # put close_data and date index into new df of just close data
-            data: pd.DataFrame = pd.DataFrame(
-                close_data, index=amazon_df.index, columns=["Close"]
-            )
-            data = data.sort_index()
-            # model = lstm_single_layer_model(data)
-            model = lstm_multi_layered(data, "relu", 1)
-            preds = generate_five_day_predictions_lstm(data, model)
-            # since we have created the predictions, we can now connect to alpaca
-            # and buy or sell based on the predictions
-            xgb_key, lstm_key, xgb_sec, lstm_sec = get_keys()
-            # alpaca = Alpaca()
-            # alpaca.connect()
-            # print("Connected to Alpaca")
+            pass
     else:
         print("Invalid input")
     return 0
