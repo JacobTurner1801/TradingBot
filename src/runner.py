@@ -141,8 +141,22 @@ def main():
         if inp == 1:
             # connect to xgboost alpaca account
             xg = Alpaca(xk, xs)
+            df = xg.query(
+                symbols=["AMZN"],
+                start_date="1/9/2022",
+                end_date="1/9/2023",
+                timeframe="1d",
+            )
+            print(f"shape: {df.shape}")
         if inp == 2:
-            pass
+            ls = Alpaca(lk, ls)
+            df = ls.query(
+                symbols=["AMZN"],
+                start_date="1/9/2022",
+                end_date="1/9/2023",
+                timeframe="1d",
+            )
+            print(f"shape: {df.shape}")
     else:
         print("Invalid input")
     return 0
