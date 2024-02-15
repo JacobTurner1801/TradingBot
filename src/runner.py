@@ -9,7 +9,9 @@ from util import get_data, split_data, get_metrics_results
 from models.xgboost.gb_model import *
 from models.lstm.ls_model import *
 from models.lstm.ls_multi_layered_model import *
+
 from pybroker import Alpaca
+from alpaca.trading.client import TradingClient
 
 
 def xg_make_preds_more_readable(preds):
@@ -148,15 +150,19 @@ def main():
                 timeframe="1d",
             )
             print(f"shape: {df.shape}")
+            xg_alp = TradingClient(xk, xs, paper=True)
+            print(xg_alp.get_account())
         if inp == 2:
-            ls = Alpaca(lk, ls)
-            df = ls.query(
+            lstm = Alpaca(lk, ls)
+            df = lstm.query(
                 symbols=["AMZN"],
                 start_date="1/9/2022",
                 end_date="1/9/2023",
                 timeframe="1d",
             )
             print(f"shape: {df.shape}")
+            ls_alp = TradingClient(lk, ls, paper=True)
+            print(ls_alp.get_account())
     else:
         print("Invalid input")
     return 0
