@@ -31,7 +31,7 @@ def lstm_multi_layered(
     @return model
     """
     l = neuron_list
-    print(l)
+    # print(l)
     model = Sequential()
     for i in range(len(neuron_list)):
         model.add(
