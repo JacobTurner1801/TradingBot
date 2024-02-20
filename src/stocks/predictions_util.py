@@ -31,11 +31,21 @@ def get_todays_prediction(df: pd.DataFrame, date: datetime._Date):
     return df.loc[date, "Close"]
 
 
-def get_metrics_for_todays_prediction(pred_for_today, actual_close: float):
+def get_error_for_todays_prediction(pred_for_today, actual_close: float):
     """
     Gets the metrics for today's prediction.
     @param preds: DataFrame
     @param actual_close: float
     @return metrics: dict
     """
-    return get_metrics_results(actual_close, pred_for_today)
+    return pred_for_today - actual_close
+
+
+def get_metrics_for_all_predictions(preds: pd.DataFrame, actuals: pd.DataFrame):
+    """
+    Gets the metrics for all predictions.
+    @param preds: DataFrame
+    @param actuals: DataFrame
+    @return metrics: DataFrame
+    """
+    return get_metrics_results(actuals, preds)
