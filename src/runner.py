@@ -9,9 +9,17 @@ from util import get_data, split_data, get_metrics_results
 from models.xgboost.gb_model import *
 from models.lstm.ls_model import *
 from models.lstm.ls_multi_layered_model import *
+from keras.optimizers import Adam, Adagrad, RMSprop
 
 from pybroker import Alpaca
 from alpaca.trading.client import TradingClient
+
+
+OPS = [
+    Adam(learning_rate=0.001),
+    Adagrad(learning_rate=0.001),
+    RMSprop(learning_rate=0.001),
+]
 
 
 def xg_make_preds_more_readable(preds):
@@ -99,7 +107,8 @@ def ls_path_mvp(stock):
     amazon_df = get_data(stock, "max")
     amazon_df.dropna()
     X_train, X_test, y_train, y_test, scaler = ls_do_data_prep(amazon_df)
-    model = lstm_multi_layered("relu", 5, [100, 50, 20], "adam")
+
+    model = lstm_multi_layered("relu", 5, [100, 50, 20], OPS[0])
     model.fit(X_train, y_train, epochs=50, batch_size=16)
     predicted_prices = model.predict(X_test)
     predicted_prices = scaler.inverse_transform(predicted_prices)
@@ -116,11 +125,13 @@ def run_type_model_mvp():
         print(f"metrics: {metrics}")
         print(f"preds: {preds}")
         preds.to_csv("xgboost_preds.csv")
+        metrics.to_csv("xgboost_metrics_initial.csv")
     elif inp == 2:
         metrics, preds = ls_path_mvp("AMZN")
         print(f"metrics: {metrics}")
         print(f"preds: {preds}")
         preds.to_csv("lstm_preds.csv")
+        metrics.to_csv("lstm_metrics_initial.csv")
     else:
         print("Invalid input")
 
