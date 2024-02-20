@@ -1,5 +1,6 @@
 import pandas as pd
 import datetime
+from util import get_metrics_results
 
 
 def read_predictions(path) -> pd.DataFrame:
@@ -28,3 +29,13 @@ def get_todays_prediction(df: pd.DataFrame, date: datetime._Date):
     @return prediction
     """
     return df.loc[date, "Close"]
+
+
+def get_metrics_for_todays_prediction(pred_for_today, actual_close: float):
+    """
+    Gets the metrics for today's prediction.
+    @param preds: DataFrame
+    @param actual_close: float
+    @return metrics: dict
+    """
+    return get_metrics_results(actual_close, pred_for_today)
