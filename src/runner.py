@@ -173,7 +173,7 @@ def run_stock_stuff(tc: TradingClient, stock_symbol: str, path_to_preds: str):
 
 def main():
     xk, lk, xs, ls = get_keys()
-    inp = int(input("1 for MVP, 2 for full software:"))
+    inp = int(input("1 for generating predictions, 2 for alpaca:"))
     if inp == 1:  # MVP
         run_type_model_mvp()
     elif inp == 2:  # Alpaca stuff
