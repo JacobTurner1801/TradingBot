@@ -1,15 +1,18 @@
 # Author: Jacob Turner
 # Main job is to run each model on the data up until today
 # and then predict the next day's price
+import datetime
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
+import yfinance
 from keys.read_keys import *
 from util import get_data, split_data, get_metrics_results
 from models.xgboost.gb_model import *
 from models.lstm.ls_model import *
 from models.lstm.ls_multi_layered_model import *
 from keras.optimizers import Adam, Adagrad, RMSprop
+from stocks.stocks_logic import logic
 
 from pybroker import Alpaca
 from alpaca.trading.client import TradingClient
@@ -144,6 +147,30 @@ def get_keys():
     return xk, lk, xs, ls
 
 
+def get_todays_price(stock_symbol: str):
+    # Get today's date
+    today = datetime.now().strftime("%Y-%m-%d")
+    # Download historical data for today
+    data = yfinance.download(stock_symbol, start=today, end=today)
+    # Extract the close price for today
+    close_price_today = data["Close"].iloc[0]
+    return close_price_today
+
+
+def run_stock_stuff(tc: TradingClient, stock_symbol: str, path_to_preds: str):
+    # load xgboost preds file
+    preds = pd.read_csv(path_to_preds)
+    # get tomorrows date
+    tomorrow = datetime.now() + timedelta(days=1)
+    # get prediction for tomorrow
+    tomorrow_pred = preds.loc[tomorrow]
+    print(f"tomorrow's prediction: {tomorrow_pred}")
+    # buy or sell based on prediction
+    todays_price = get_todays_price(stock_symbol)
+    logic(tomorrow_pred, todays_price, stock_symbol, 10, tc)
+    print("done")
+
+
 def main():
     xk, lk, xs, ls = get_keys()
     inp = int(input("1 for MVP, 2 for full software:"))
@@ -155,7 +182,7 @@ def main():
             # connect to xgboost alpaca account
             xg = Alpaca(xk, xs)
             df = xg.query(
-                symbols=["AMZN"],
+                symbols=["BARC.L"],
                 start_date="1/9/2022",
                 end_date="1/9/2023",
                 timeframe="1d",
@@ -163,6 +190,7 @@ def main():
             print(f"shape: {df.shape}")
             xg_alp = TradingClient(xk, xs, paper=True)
             print(xg_alp.get_account())
+            run_stock_stuff(xg_alp, "BCS", "xgboost_preds.csv")
         if inp == 2:
             lstm = Alpaca(lk, ls)
             df = lstm.query(
@@ -174,6 +202,7 @@ def main():
             print(f"shape: {df.shape}")
             ls_alp = TradingClient(lk, ls, paper=True)
             print(ls_alp.get_account())
+            run_stock_stuff(ls_alp, "BCS", "lstm_preds.csv")
     else:
         print("Invalid input")
     return 0
