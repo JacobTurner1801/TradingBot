@@ -1,6 +1,4 @@
 # Author: Jacob Turner
-# Main job is to run each model on the data up until today
-# and then predict the next day's price
 import datetime
 import numpy as np
 import pandas as pd
