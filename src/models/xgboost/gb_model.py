@@ -39,9 +39,9 @@ def bayesian_optimisation(X, y):
     xgb_bo = BayesianOptimization(
         xgb_evaluate,
         {
-            "n_est": (100, 1200),
-            "lr": (0.01, 0.3),
-            "md": (3, 10),
+            "n_est": (100, 500, 1000),
+            "lr": (0.01, 0.3, 0.5),
+            "md": (3, 10, 20),
         },
     )
 
