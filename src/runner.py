@@ -14,7 +14,7 @@ from models.lstm.ls_multi_layered_model import *
 from keras.optimizers import Adam, Adagrad, RMSprop
 from stocks.stocks_logic import logic
 
-from pybroker import Alpaca
+# from pybroker import Alpaca
 from alpaca.trading.client import TradingClient
 
 
@@ -180,29 +180,33 @@ def main():
         inp = int(input("Enter 1 for XGBoost, 2 for LSTM: "))
         if inp == 1:
             # connect to xgboost alpaca account
-            xg = Alpaca(xk, xs)
-            df = xg.query(
-                symbols=["BARC.L"],
-                start_date="1/9/2022",
-                end_date="1/9/2023",
-                timeframe="1d",
-            )
+            # xg = Alpaca(xk, xs)  # pybroker
+            # df = xg.query(
+            #     symbols=["BCS"],
+            #     start_date="1/9/2022",
+            #     end_date="1/9/2023",
+            #     timeframe="1d",
+            # )
+            df = get_data("BARC.L", "max")
+            print(f"shape: {df.shape}")
             print(f"shape: {df.shape}")
             xg_alp = TradingClient(xk, xs, paper=True)
             print(xg_alp.get_account())
-            run_stock_stuff(xg_alp, "BCS", "xgboost_preds.csv")
+            # run_stock_stuff(xg_alp, "BARC", "xgboost_preds.csv")
         if inp == 2:
-            lstm = Alpaca(lk, ls)
-            df = lstm.query(
-                symbols=["AMZN"],
-                start_date="1/9/2022",
-                end_date="1/9/2023",
-                timeframe="1d",
-            )
+            # lstm = Alpaca(lk, ls)  # pybroker
+            # df = lstm.query(
+            #     symbols=["BCS"],
+            #     start_date="1/9/2022",
+            #     end_date="1/9/2023",
+            #     timeframe="1d",
+            # )
+            # print(f"shape: {df.shape}")
+            df = get_data("BARC.L", "max")
             print(f"shape: {df.shape}")
             ls_alp = TradingClient(lk, ls, paper=True)
             print(ls_alp.get_account())
-            run_stock_stuff(ls_alp, "BCS", "lstm_preds.csv")
+            # run_stock_stuff(ls_alp, "BARC.L", "lstm_preds.csv")
     else:
         print("Invalid input")
     return 0
