@@ -47,8 +47,21 @@ def xg_path_bayesian_optimisation(stock):
     return df_res, preds
 
 
+def xg_path_best(stock):
+    df = get_data(stock, "max")
+    df.dropna()
+    X_train, x_test, y_train, y_test = split_data(df)
+    model = create_model_best()
+    model.fit(X_train, y_train)
+    predictions = model.predict(x_test)
+    df_res = get_metrics_results(y_test, predictions)
+    preds = generate_five_day_predictions_xgb(df)
+    preds = xg_make_preds_more_readable(preds)
+    return df_res, preds
+
+
 def xg_path_mvp(stock):
-    df_res, preds = xg_path_bayesian_optimisation(stock)
+    df_res, preds = xg_path_best(stock)
     return df_res, preds
 
 
@@ -124,14 +137,14 @@ def run_type_model_mvp():
         metrics, preds = xg_path_mvp("AMZN")
         print(f"metrics: {metrics}")
         print(f"preds: {preds}")
-        # preds.to_csv("xgboost_preds.csv")
+        preds.to_csv("xgboost_preds.csv")
         metrics.to_csv("../metrics_mvp/xgb/xgboost_metrics_mvp_5.csv")
     elif inp == 2:
         metrics, preds = ls_path_mvp("AMZN")
         print(f"metrics: {metrics}")
         print(f"preds: {preds}")
         preds.to_csv("lstm_preds.csv")
-        metrics.to_csv("../metrics_mvp/lstm/lstm_1.csv")
+        metrics.to_csv("../metrics_mvp/lstm/Adam/Single/<insert-hyper-params-here>.csv")
     else:
         print("Invalid input")
 

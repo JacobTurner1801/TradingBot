@@ -17,6 +17,17 @@ def create_model(n_est=1000, lr=0.01, md=5):
     return model
 
 
+def create_model_best():
+    """
+    Create xgboost model using best parameters
+    @return model
+    """
+    model = xgboost.XGBRegressor(
+        n_estimators=578, learning_rate=0.02733, max_depth=9, random_state=1
+    )
+    return model
+
+
 def bayesian_optimisation(X, y):
     """
     Perform bayesian optimisation on the model
