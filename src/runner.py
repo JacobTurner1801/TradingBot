@@ -9,7 +9,7 @@ from util import get_data, split_data, get_metrics_results
 from models.xgboost.gb_model import *
 from models.lstm.ls_model import *
 from models.lstm.ls_multi_layered_model import *
-from keras.optimizers import Adam, AdamW
+from keras.optimizers import AdamW
 from stocks.stocks_logic import logic
 
 # from pybroker import Alpaca
@@ -17,7 +17,6 @@ from alpaca.trading.client import TradingClient
 
 
 OPS = [
-    Adam(learning_rate=0.001),
     AdamW(learning_rate=0.001),
 ]
 
