@@ -115,35 +115,41 @@ def make_lstm_preds_better_df(preds):
     return new_preds
 
 
-def ls_path_mvp(stock):
-    amazon_df = get_data(stock, "max")
-    amazon_df.dropna()
-    X_train, X_test, y_train, y_test, scaler = ls_do_data_prep(amazon_df)
+def best_lstm_model(stock):
+    data = get_data(stock, "max")
+    data.dropna()
+    X_train, X_test, y_train, y_test, scaler = ls_do_data_prep(data)
 
-    model = lstm_multi_layered("relu", 5, [100, 50, 20], OPS[0])
+    model = lstm_multi_layered("tanh", 5, [150], OPS[0])
     model.fit(X_train, y_train, epochs=50, batch_size=16)
     predicted_prices = model.predict(X_test)
     predicted_prices = scaler.inverse_transform(predicted_prices)
     y_test = scaler.inverse_transform(y_test.reshape(-1, 1))
     df_res = get_metrics_results(y_test, predicted_prices)
-    preds = generate_five_day_predictions_lstm(amazon_df, model)
-    return df_res, make_lstm_preds_better_df(preds)
+    preds = generate_five_day_predictions_lstm(data, model)
+    preds = make_lstm_preds_better_df(preds)
+    return df_res, preds
+
+
+def ls_path_mvp(stock):
+    df_res, preds = best_lstm_model(stock)
+    return df_res, preds
 
 
 def run_type_model_mvp():
     inp = int(input("Enter 1 for XGBoost, 2 for LSTM: "))
     if inp == 1:
-        metrics, preds = xg_path_mvp("AMZN")
+        metrics, preds = xg_path_mvp("BARC.L")
         print(f"metrics: {metrics}")
         print(f"preds: {preds}")
         preds.to_csv("xgboost_preds.csv")
         metrics.to_csv("../metrics_mvp/xgb/xgboost_metrics_mvp_5.csv")
     elif inp == 2:
-        metrics, preds = ls_path_mvp("AMZN")
+        metrics, preds = ls_path_mvp("BARC.L")
         print(f"metrics: {metrics}")
         print(f"preds: {preds}")
         preds.to_csv("lstm_preds.csv")
-        metrics.to_csv("../metrics_mvp/lstm/Adam/Single/<insert-hyper-params-here>.csv")
+        metrics.to_csv("../metrics_mvp/lstm/Multi/15010050/15010050tanh16.csv")
     else:
         print("Invalid input")
 
@@ -188,34 +194,18 @@ def main():
     elif inp == 2:  # Alpaca stuff
         inp = int(input("Enter 1 for XGBoost, 2 for LSTM: "))
         if inp == 1:
-            # connect to xgboost alpaca account
-            # xg = Alpaca(xk, xs)  # pybroker
-            # df = xg.query(
-            #     symbols=["BCS"],
-            #     start_date="1/9/2022",
-            #     end_date="1/9/2023",
-            #     timeframe="1d",
-            # )
             df = get_data("BARC.L", "max")
             print(f"shape: {df.shape}")
             print(f"shape: {df.shape}")
             xg_alp = TradingClient(xk, xs, paper=True)
             print(xg_alp.get_account())
-            # run_stock_stuff(xg_alp, "BARC", "xgboost_preds.csv")
+            run_stock_stuff(xg_alp, "BCS", "xgboost_preds.csv")
         if inp == 2:
-            # lstm = Alpaca(lk, ls)  # pybroker
-            # df = lstm.query(
-            #     symbols=["BCS"],
-            #     start_date="1/9/2022",
-            #     end_date="1/9/2023",
-            #     timeframe="1d",
-            # )
-            # print(f"shape: {df.shape}")
             df = get_data("BARC.L", "max")
             print(f"shape: {df.shape}")
             ls_alp = TradingClient(lk, ls, paper=True)
             print(ls_alp.get_account())
-            # run_stock_stuff(ls_alp, "BARC.L", "lstm_preds.csv")
+            run_stock_stuff(ls_alp, "BCS", "lstm_preds.csv")
     else:
         print("Invalid input")
     return 0

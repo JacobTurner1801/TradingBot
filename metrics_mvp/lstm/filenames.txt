@@ -1,3 +1,1 @@
-<path>/<neurons>-<learningrate>-<batchsize>
-learningrate: 1 -> 0.1, 2 -> 0.01, 3 -> 0.001
-batchsize: 1 -> 4, 2 -> 8, 3 -> 16
+<path>/<neurons>-<af>-<batchsize>

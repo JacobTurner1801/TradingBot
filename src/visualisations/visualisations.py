@@ -65,5 +65,5 @@ def merge_metrics_files(path: str):
 
 
 # CHANGE THIS PATH FOR THE CSV FILES TO MERGE
-df = merge_metrics_files("../../metrics_mvp/xgb/")
-print(df)
+# df = merge_metrics_files("../../metrics_mvp/lstm/Multi/15010050/")
+# print(df)
