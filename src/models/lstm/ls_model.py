@@ -62,7 +62,7 @@ def generate_five_day_predictions_lstm(df, model):
 
     X, y = np.array(X), np.array(y)
 
-    run_model_whole_dataset(model, X, y, 50, 32)
+    run_model_whole_dataset(model, X, y, 50, 16)
 
     # Generate the next 5 items in the sequence
     last_sequence = df["Close_scaled"].values[-sequence_length:]

@@ -143,13 +143,13 @@ def run_type_model_mvp():
         print(f"metrics: {metrics}")
         print(f"preds: {preds}")
         preds.to_csv("xgboost_preds.csv")
-        metrics.to_csv("../metrics_mvp/xgb/xgboost_metrics_mvp_5.csv")
+        metrics.to_csv("./xgbmetrics_actual.csv")
     elif inp == 2:
         metrics, preds = ls_path_mvp("BARC.L")
         print(f"metrics: {metrics}")
         print(f"preds: {preds}")
         preds.to_csv("lstm_preds.csv")
-        metrics.to_csv("../metrics_mvp/lstm/Multi/15010050/15010050tanh16.csv")
+        metrics.to_csv("./lstmmetrics_actual.csv")
     else:
         print("Invalid input")
 
