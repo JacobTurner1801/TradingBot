@@ -139,13 +139,13 @@ def ls_path_mvp(stock):
 def run_type_model_mvp():
     inp = int(input("Enter 1 for XGBoost, 2 for LSTM: "))
     if inp == 1:
-        metrics, preds = xg_path_mvp("BARC.L")
+        metrics, preds = xg_path_mvp("BCS")
         print(f"metrics: {metrics}")
         print(f"preds: {preds}")
         preds.to_csv("xgboost_preds.csv")
         metrics.to_csv("./xgbmetrics_actual.csv")
     elif inp == 2:
-        metrics, preds = ls_path_mvp("BARC.L")
+        metrics, preds = ls_path_mvp("BCS")
         print(f"metrics: {metrics}")
         print(f"preds: {preds}")
         preds.to_csv("lstm_preds.csv")
