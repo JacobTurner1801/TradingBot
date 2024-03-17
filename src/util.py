@@ -39,8 +39,8 @@ def make_frame(metrics):
     return frame
 
 
-def get_metrics_results(y_test, predictions):
-    # print(predictions)
+def get_metrics_results(y_test, predictions: pd.DataFrame):
+    predictions.to_csv("validation_preds_.csv")
     mae = mean_absolute_error(y_test, predictions)
     rmse = np.sqrt(mean_squared_error(y_test, predictions))
     smape = symetric_mape(y_test, predictions)
