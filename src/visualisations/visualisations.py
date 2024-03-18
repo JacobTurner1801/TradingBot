@@ -2,8 +2,8 @@ import os
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
-
-# import numpy as np
+import yfinance as yf
+import numpy as np
 
 
 def plot_predictions(preds: pd.DataFrame, actuals: pd.DataFrame):
@@ -64,6 +64,63 @@ def merge_metrics_files(path: str):
     return df
 
 
-# CHANGE THIS PATH FOR THE CSV FILES TO MERGE
-# df = merge_metrics_files("../../metrics_mvp/lstm/Multi/15010050/")
-# print(df)
+def create_moving_average(df: pd.DataFrame, window: int):
+    """
+    Creates a moving average of the close price.
+    @param df: DataFrame
+    @param window: int
+    @return moving_average: DataFrame
+    """
+    moving_average = df["Close"].rolling(window=window).mean()
+    return moving_average
+
+
+def plot_close_prices_from_csvs(validation_path: str, preds_path: str):
+    orig = yf.download("BCS", period="max")
+    orig = orig[["Close"]]
+    dates = orig.index[-len(orig) :]
+    orig = pd.DataFrame(orig, columns=["Close"], index=dates)
+    df_val = pd.read_csv(validation_path)
+    df_val["Date"] = pd.to_datetime(df_val["Date"])
+    df_val["Avg"] = create_moving_average(df_val, 31)
+    df_preds = pd.read_csv(preds_path)
+    df_preds["Date"] = pd.to_datetime(df_preds["Date"])
+
+    plt.figure(figsize=(15, 6))
+    # Plot close prices
+    plt.plot(orig, label="Close Price")
+
+    # Plot validation predictions
+    plt.plot(
+        df_val["Date"],
+        df_val["Avg"],
+        label="Validation Prediction",
+    )
+
+    # make the validation predictions appear above the actual close prices
+
+    # Plot future prediction (as a single point)
+    plt.plot(
+        df_preds["Date"],
+        df_preds["Close"],
+        label="Future Prediction",
+    )
+
+    # Add labels and title
+    plt.xlabel("Date")
+    plt.ylabel("Price")
+    plt.title(f"BCS Price Predictions")
+
+    # Add legend
+    plt.legend()
+
+    # Rotate x-axis labels for better readability
+    plt.xticks(rotation=45)
+
+    # Show the plot
+    plt.grid(True)
+    # plt.tight_layout()
+    plt.show()
+
+
+plot_close_prices_from_csvs("../validation_preds_xgb.csv", "../xgboost_preds_2.csv")

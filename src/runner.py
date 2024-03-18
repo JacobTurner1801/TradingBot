@@ -53,7 +53,9 @@ def xg_path_best(stock):
     model = create_model_best()
     model.fit(X_train, y_train)
     predictions = model.predict(x_test)
-    predictions_df = pd.DataFrame(predictions, columns=["Close"])
+    # get dates
+    dates = df.index[-len(predictions) :]
+    predictions_df = pd.DataFrame(predictions, columns=["Close"], index=dates)
     predictions_df.to_csv("validation_preds_xgb.csv")
     df_res = get_metrics_results(y_test, predictions)
     preds = generate_five_day_predictions_xgb(df)
@@ -127,7 +129,8 @@ def best_lstm_model(stock):
     predicted_prices = model.predict(X_test)
     predicted_prices = scaler.inverse_transform(predicted_prices)
     y_test = scaler.inverse_transform(y_test.reshape(-1, 1))
-    predicted_prices_df = pd.DataFrame(predicted_prices, columns=["Close"])
+    dates = data.index[-len(predicted_prices) :]
+    predicted_prices_df = pd.DataFrame(predicted_prices, columns=["Close"], index=dates)
     predicted_prices_df.to_csv("validation_preds_lstm.csv")
     df_res = get_metrics_results(y_test, predicted_prices)
     preds = generate_five_day_predictions_lstm(data, model)
