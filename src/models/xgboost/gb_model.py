@@ -117,8 +117,8 @@ def generate_five_day_predictions_xgb(df: pd.DataFrame):
             {"Date": last_date + timedelta(days=i + 1), "Close": next_item}
         )
 
-    for item in next_items:
-        print(f"Date: {item['Date']}, Close: {item['Close']}")
+    # for item in next_items:
+    #     print(f"Date: {item['Date']}, Close: {item['Close']}")
     return pd.DataFrame(next_items)
 
 
