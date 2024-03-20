@@ -9,7 +9,7 @@ def create_buy_order(account: TradingClient, symbol, qty):
         qty=qty,
         side=OrderSide.BUY,
         type=OrderType.MARKET,
-        time_in_force=TimeInForce.DAY,
+        time_in_force=TimeInForce.GTC,
     )
     return account.submit_order(market_order_req)
 
@@ -20,6 +20,6 @@ def create_sell_order(account: TradingClient, symbol, qty):
         qty=qty,
         side=OrderSide.SELL,
         type=OrderType.MARKET,
-        time_in_force=TimeInForce.DAY,
+        time_in_force=TimeInForce.GTC,
     )
     return account.submit_order(market_order_req)

@@ -8,7 +8,7 @@ def logic(tomorrow_pred, current_price, sym, qty, acc: TradingClient):
         print(
             f"Buying {qty} shares of {sym} at {current_price} with order id {order.id}"
         )
-    elif tomorrow_pred < current_price:
+    elif tomorrow_pred < current_price and len(acc.get_all_positions()) > 0:
         order = create_sell_order(account=acc, symbol=sym, qty=qty)
         print(
             f"Selling {qty} shares of {sym} at {current_price} with order id {order.id}"

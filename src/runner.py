@@ -170,13 +170,11 @@ def get_keys():
 
 
 def get_todays_price(stock_symbol: str):
-    # Get today's date
-    today = datetime.today().strftime("%Y-%m-%d")
     # Download historical data for today
-    data = yfinance.download(stock_symbol, start=today, end=today)
+    data = yfinance.download(stock_symbol, period="1d")
     print(f"data: {data}")
     # Extract the close price for today
-    close_price_today = data["Close"].iloc[0]
+    close_price_today = data["Close"].values[0]
     return close_price_today
 
 
@@ -187,7 +185,7 @@ def run_stock_stuff(tc: TradingClient, stock_symbol: str, path_to_preds: str):
     tomorrow = datetime.today() + timedelta(days=1)
     print(f"tomorrow: {tomorrow}")
     # get prediction for tomorrow
-    tomorrow_pred = preds.iloc[0]["Close"]
+    tomorrow_pred = preds.loc[preds["Date"] == str(tomorrow.date())]["Close"].values[0]
     print(f"tomorrow's prediction: {tomorrow_pred}")
     # buy or sell based on prediction
     todays_price = get_todays_price("BCS")
@@ -208,13 +206,13 @@ def main():
             # print(f"shape: {df.shape}")
             xg_alp = TradingClient(xk, xs, paper=True)
             print(xg_alp.get_account())
-            run_stock_stuff(xg_alp, "BCS", "./xgboost_preds.csv")
+            run_stock_stuff(xg_alp, "BCS", "./xgboost_preds_2.csv")
         if inp == 2:
             # df = get_data("BARC.L", "max")
             # print(f"shape: {df.shape}")
             ls_alp = TradingClient(lk, ls, paper=True)
             print(ls_alp.get_account())
-            run_stock_stuff(ls_alp, "BCS", "./lstm_preds.csv")
+            run_stock_stuff(ls_alp, "BCS", "./lstm_preds_2.csv")
     else:
         print("Invalid input")
     return 0
