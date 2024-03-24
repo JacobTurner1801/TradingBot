@@ -4,45 +4,42 @@ import seaborn as sns
 import pandas as pd
 import yfinance as yf
 import numpy as np
+from datetime import datetime
 
 
-def plot_predictions(preds: pd.DataFrame, actuals: pd.DataFrame):
+def plot_predictions(preds_path: str, stock: str):
     """
     Plots the predictions and actuals.
     @param preds: DataFrame
     @param actuals: DataFrame
     """
-    # set colour theme
-    sns.axes_style("dark")
-    plt.plot(preds, label="Predictions")
-    plt.plot(actuals, label="Actuals")
+    orig = yf.download(stock, start="2024-03-19", end="2024-03-23")
+    orig = orig[["Close"]]
+    dates = orig.index[-len(orig) :]
+    orig = pd.DataFrame(orig, columns=["Close"], index=dates)
+    preds = pd.read_csv(preds_path)
+    preds["Date"] = pd.to_datetime(preds["Date"])
+    # remove last row
+    preds = preds[:-1]
+    plt.figure(figsize=(15, 6))
+    # Plot close prices
+    plt.plot(orig, label="Close Price", marker="o", linestyle="--")
+    # Plot validation predictions
+    plt.plot(
+        preds["Date"], preds["Close"], label="Prediction", marker="o", linestyle="--"
+    )
+    # Add labels and title
     plt.xlabel("Date")
-    plt.ylabel("Close Price")
-    plt.title("Predictions vs Actuals")
+    plt.ylabel("Price")
+    plt.title(f"Price Predictions")
+    # Add legend
     plt.legend()
+    # Rotate x-axis labels for better readability
+    plt.xticks(rotation=45)
+    # Show the plot
+    plt.grid(True)
+    # plt.tight_layout()
     plt.show()
-
-
-def plot_metrics(metrics: pd.DataFrame):
-    """
-    Plots the metrics.
-    @param metrics: DataFrame
-    """
-    sns.axes_style("dark")
-    plt.plot(metrics)
-    plt.xlabel("Metric")
-    plt.ylabel("Value")
-    plt.title("Metrics")
-    plt.show()
-
-
-def create_metrics_table(metrics: pd.DataFrame):
-    """
-    Creates a table of metrics.
-    @param metrics: DataFrame
-    @return table: DataFrame
-    """
-    return pd.plotting.table(data=metrics, loc="center", colWidths=[0.2, 0.2, 0.2, 0.2])
 
 
 def merge_metrics_files(path: str):
@@ -75,16 +72,16 @@ def create_moving_average(df: pd.DataFrame, window: int):
     return moving_average
 
 
-def plot_close_prices_from_csvs(validation_path: str, preds_path: str):
-    orig = yf.download("BCS", period="max")
+def plot_validation_prices_from_csvs(stock: str, validation_path: str):
+    orig = yf.download(stock, end="2024-03-18")
     orig = orig[["Close"]]
     dates = orig.index[-len(orig) :]
     orig = pd.DataFrame(orig, columns=["Close"], index=dates)
     df_val = pd.read_csv(validation_path)
     df_val["Date"] = pd.to_datetime(df_val["Date"])
-    df_val["Avg"] = create_moving_average(df_val, 31)
-    df_preds = pd.read_csv(preds_path)
-    df_preds["Date"] = pd.to_datetime(df_preds["Date"])
+    df_val["Avg"] = create_moving_average(df_val, 8)
+    # df_preds = pd.read_csv(preds_path)
+    # df_preds["Date"] = pd.to_datetime(df_preds["Date"])
 
     plt.figure(figsize=(15, 6))
     # Plot close prices
@@ -100,16 +97,16 @@ def plot_close_prices_from_csvs(validation_path: str, preds_path: str):
     # make the validation predictions appear above the actual close prices
 
     # Plot future prediction (as a single point)
-    plt.plot(
-        df_preds["Date"],
-        df_preds["Close"],
-        label="Future Prediction",
-    )
+    # plt.plot(
+    #     df_preds["Date"],
+    #     df_preds["Close"],
+    #     label="Future Prediction",
+    # )
 
     # Add labels and title
     plt.xlabel("Date")
     plt.ylabel("Price")
-    plt.title(f"BCS Price Predictions")
+    plt.title(f"Price Predictions LSTM Validation Data")
 
     # Add legend
     plt.legend()
@@ -123,4 +120,28 @@ def plot_close_prices_from_csvs(validation_path: str, preds_path: str):
     plt.show()
 
 
-plot_close_prices_from_csvs("../validation_preds_xgb.csv", "../xgboost_preds_2.csv")
+# plot_validation_prices_from_csvs("BCS", "../validation_preds_lstm.csv")
+
+
+def main():
+    stock = "BCS"
+    actuals = yf.download(stock, start="2024-03-19", end="2024-03-23")
+    actuals = actuals[["Close"]]
+    dates = actuals.index[-len(actuals) :]
+    actuals = pd.DataFrame(actuals, columns=["Close"], index=dates)
+    # print(actuals)
+    print("Do you want to:")
+    print("1. Plot validation")
+    print("2. Plot predictions")
+    inp = int(input("Enter 1 or 2: "))
+    if inp == 1:
+        validation_path = str(input("Enter path to validation predictions: "))
+        plot_validation_prices_from_csvs(stock, validation_path)
+    elif inp == 2:
+        preds_path = input("Enter path to predictions: ")
+        plot_predictions(preds_path, stock)
+    else:
+        print("Invalid input")
+
+
+main()
