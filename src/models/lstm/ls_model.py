@@ -1,7 +1,7 @@
 from keras.models import Sequential
 from keras.layers import Dense
 import numpy as np
-from datetime import timedelta
+from datetime import datetime, timedelta
 from sklearn.preprocessing import MinMaxScaler
 from models.lstm.lstm_util import *
 import pandas as pd
@@ -68,8 +68,8 @@ def generate_five_day_predictions_lstm(df, model):
     last_sequence = df["Close_scaled"].values[-sequence_length:]
     next_items = []
 
-    # Assume last_date is the last date in your dataset
-    last_date = df.index[-1]
+    last_date = datetime.today().strftime("%Y-%m-%d")
+    last_date = datetime.strptime(last_date, "%Y-%m-%d")  # convert to datetime
 
     for i in range(5):
         # Reshape the sequence for prediction

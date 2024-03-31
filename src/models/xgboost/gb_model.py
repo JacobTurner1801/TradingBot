@@ -2,7 +2,7 @@ from sklearn.model_selection import cross_val_score
 import xgboost as xgboost
 import numpy as np
 import pandas as pd
-from datetime import timedelta
+from datetime import datetime, timedelta
 from bayes_opt import BayesianOptimization
 
 
@@ -106,7 +106,8 @@ def generate_five_day_predictions_xgb(df: pd.DataFrame):
     last_sequence = data["Close"].values[-10:]
     # print(f"first last_sequence: {last_sequence}")
     next_items = []
-    last_date = data.index[-1]
+    last_date = datetime.today().strftime("%Y-%m-%d")
+    last_date = datetime.strptime(last_date, "%Y-%m-%d")  # convert to datetime
     for i in range(5):
         input_sequence = last_sequence.reshape(1, 10)
         # print(f"input_seq: {input_sequence}")
