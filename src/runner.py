@@ -202,14 +202,10 @@ def main():
     elif inp == 2:  # Alpaca stuff
         inp = int(input("Enter 1 for XGBoost, 2 for LSTM: "))
         if inp == 1:
-            # df = get_data("BARC.L", "max")
-            # print(f"shape: {df.shape}")
             xg_alp = TradingClient(xk, xs, paper=True)
             print(xg_alp.get_account())
             run_stock_stuff(xg_alp, "BCS", "./xgboost_preds_2.csv")
         if inp == 2:
-            # df = get_data("BARC.L", "max")
-            # print(f"shape: {df.shape}")
             ls_alp = TradingClient(lk, ls, paper=True)
             print(ls_alp.get_account())
             run_stock_stuff(ls_alp, "BCS", "./lstm_preds_2.csv")
