@@ -133,7 +133,7 @@ def best_lstm_model(stock):
     predicted_prices_df = pd.DataFrame(predicted_prices, columns=["Close"], index=dates)
     predicted_prices_df.to_csv("validation_preds_lstm.csv")
     df_res = get_metrics_results(y_test, predicted_prices)
-    preds = generate_five_day_predictions_lstm(data, model)
+    preds = generate_five_day_predictions_lstm(data, model, 16)
     preds = make_lstm_preds_better_df(preds)
     return df_res, preds
 
