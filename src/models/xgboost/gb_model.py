@@ -101,7 +101,7 @@ def generate_five_day_predictions_xgb(df: pd.DataFrame):
         X.append(data["Close"].values[i : i + 10])
         y.append(data["Close"].values[i + 10 + 5])
     X, y = np.array(X), np.array(y)
-    model = create_model()
+    model = create_model_best()
     model.fit(X, y)
     last_sequence = data["Close"].values[-10:]
     # print(f"first last_sequence: {last_sequence}")
