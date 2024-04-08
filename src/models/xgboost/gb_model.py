@@ -88,13 +88,8 @@ def train_and_fit(x_train, y_train, x_test):
 
 
 def generate_five_day_predictions_xgb(df: pd.DataFrame, model):
-    """
-    Generate 5 day predictions using xgboost model
-    @return nothing, just prints the predictions
-    """
     df = df.dropna()
     df = df.sort_index()
-    # lets only work with time series data then I can refactor later
     data = pd.DataFrame(data=df["Close"].values, index=df.index, columns=["Close"])
     X, y = [], []
     for i in range(len(data) - 10 - 5):
@@ -103,7 +98,6 @@ def generate_five_day_predictions_xgb(df: pd.DataFrame, model):
     X, y = np.array(X), np.array(y)
     model.fit(X, y)
     last_sequence = data["Close"].values[-10:]
-    # print(f"first last_sequence: {last_sequence}")
     next_items = []
     last_date = datetime.today().strftime("%Y-%m-%d")
     last_date = datetime.strptime(last_date, "%Y-%m-%d")  # convert to datetime
@@ -116,9 +110,6 @@ def generate_five_day_predictions_xgb(df: pd.DataFrame, model):
         next_items.append(
             {"Date": last_date + timedelta(days=i + 1), "Close": next_item}
         )
-
-    # for item in next_items:
-    #     print(f"Date: {item['Date']}, Close: {item['Close']}")
     return pd.DataFrame(next_items)
 
 
