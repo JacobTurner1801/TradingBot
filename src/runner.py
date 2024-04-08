@@ -58,7 +58,7 @@ def xg_path_best(stock):
     predictions_df = pd.DataFrame(predictions, columns=["Close"], index=dates)
     predictions_df.to_csv("validation_preds_xgb.csv")
     df_res = get_metrics_results(y_test, predictions)
-    preds = generate_five_day_predictions_xgb(df)
+    preds = generate_five_day_predictions_xgb(df, model)
     preds = xg_make_preds_more_readable(preds)
     return df_res, preds
 
