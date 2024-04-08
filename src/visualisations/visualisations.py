@@ -124,7 +124,7 @@ def plot_validation_prices_from_csvs(stock: str, validation_path: str):
 
 
 def main():
-    stock = "BCS"
+    stock = str(input("Enter stock symbol: "))
     actuals = yf.download(stock, start="2024-03-19", end="2024-03-23")
     actuals = actuals[["Close"]]
     dates = actuals.index[-len(actuals) :]
