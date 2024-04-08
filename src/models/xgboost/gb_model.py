@@ -34,6 +34,8 @@ def bayesian_optimisation(X, y):
     @return model
     """
 
+    # inspired from
+    #  https://github.com/bayesian-optimization/BayesianOptimization/blob/c7e5c3926944fc6011ae7ace29f7b5ed0f9c983b/examples/sklearn_example.py
     def xgb_evaluate(n_est, lr, md):
         model = xgboost.XGBRegressor(
             n_estimators=int(n_est),
@@ -55,7 +57,6 @@ def bayesian_optimisation(X, y):
             "md": (3, 20),
         },
     )
-
     xgb_bo.maximize(init_points=10, n_iter=10)
     params = xgb_bo.max["params"]
     model = xgboost.XGBRegressor(
