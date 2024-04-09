@@ -77,6 +77,8 @@ def create_dataset_lstm(dataset, time_steps=1):
     return np.array(X), np.array(y)
 
 
+# inspired from here:
+# reference: https://machinelearningmastery.com/how-to-develop-lstm-models-for-time-series-forecasting/
 def ls_do_data_prep(data):
     # Extracting closing prices
     data = data["Close"].values.reshape(-1, 1)
